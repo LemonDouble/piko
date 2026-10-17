@@ -53,9 +53,9 @@ public class AiTimelineFilter {
 
     private static final ExecutorService executor = Executors.newFixedThreadPool(MAX_PARALLEL_REQUESTS);
 
-    private static final Map<String, double[]> probabilityCache = new LinkedHashMap<>(16, 0.75f, true) {
+    private static final Map<String, ClefClient.TopicProbabilities> probabilityCache = new LinkedHashMap<>(16, 0.75f, true) {
         @Override
-        protected boolean removeEldestEntry(Map.Entry<String, double[]> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<String, ClefClient.TopicProbabilities> eldest) {
             return size() > MAX_CACHED_JUDGEMENTS;
         }
     };
@@ -196,10 +196,10 @@ public class AiTimelineFilter {
         int timeoutMillis = timeoutMillis();
         String signature = FilterRule.cacheSignature(rules);
 
-        Map<String, double[]> probabilitiesById = new HashMap<>();
+        Map<String, ClefClient.TopicProbabilities> probabilitiesById = new HashMap<>();
         List<TimelineTweet> uncachedTweets = new ArrayList<>();
         for (TimelineTweet tweet : tweets) {
-            double[] cached;
+            ClefClient.TopicProbabilities cached;
             synchronized (probabilityCache) {
                 cached = probabilityCache.get(tweet.id + signature);
             }
@@ -224,9 +224,9 @@ public class AiTimelineFilter {
             TimelineTweet tweet = uncachedTweets.get(index);
             try {
                 ClefClient.Judgement judgement = results.get(index).get();
-                probabilitiesById.put(tweet.id, judgement.probabilities);
+                probabilitiesById.put(tweet.id, judgement.topics);
                 synchronized (probabilityCache) {
-                    probabilityCache.put(tweet.id + signature, judgement.probabilities);
+                    probabilityCache.put(tweet.id + signature, judgement.topics);
                 }
                 usage.cost += judgement.cost;
                 usage.inputTokens += judgement.inputTokens;
@@ -243,7 +243,7 @@ public class AiTimelineFilter {
         FilterVault.recordUsage(usage);
 
         Map<String, Match> matches = new HashMap<>();
-        for (Map.Entry<String, double[]> entry : probabilitiesById.entrySet()) {
+        for (Map.Entry<String, ClefClient.TopicProbabilities> entry : probabilitiesById.entrySet()) {
             Match match = strongestMatch(rules, entry.getValue());
             if (match != null) matches.put(entry.getKey(), match);
         }
@@ -264,17 +264,22 @@ public class AiTimelineFilter {
         }
     }
 
+    // A choice question splits probability across rules when a post fits several of them,
+    // so the chance of matching any rule (1 - none) is compared with the most likely rule's threshold.
     @Nullable
-    private static Match strongestMatch(List<FilterRule> rules, double[] probabilities) {
-        Match strongest = null;
+    private static Match strongestMatch(List<FilterRule> rules, ClefClient.TopicProbabilities topics) {
+        int mostLikelyIndex = -1;
         for (int index = 0; index < rules.size(); index++) {
-            FilterRule rule = rules.get(index);
-            double probability = probabilities[index];
-            if (probability >= rule.threshold && (strongest == null || probability > strongest.probability)) {
-                strongest = new Match(rule, probability);
+            if (mostLikelyIndex < 0 || topics.ruleProbabilities[index] > topics.ruleProbabilities[mostLikelyIndex]) {
+                mostLikelyIndex = index;
             }
         }
-        return strongest;
+        if (mostLikelyIndex < 0) return null;
+
+        FilterRule mostLikelyRule = rules.get(mostLikelyIndex);
+        double anyRuleProbability = 1 - topics.noneProbability;
+        if (anyRuleProbability < mostLikelyRule.threshold) return null;
+        return new Match(mostLikelyRule, anyRuleProbability);
     }
 
     private static int timeoutMillis() {

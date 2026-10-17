@@ -23,15 +23,29 @@ public class ClefClient {
     private static final String ENDPOINT = "https://openrouter.ai/api/alpha/decisions";
     private static final String MODEL = "cloudflare/clef-flash";
 
-    public static class Judgement {
+    private static final String TOPIC_QUESTION = "topic";
+    private static final String NONE_OPTION = "none";
+
+    // Probabilities of one choice question; they sum to about 1 together with noneProbability.
+    public static class TopicProbabilities {
         // Index matches the rule list passed to judge().
-        public final double[] probabilities;
+        public final double[] ruleProbabilities;
+        public final double noneProbability;
+
+        TopicProbabilities(double[] ruleProbabilities, double noneProbability) {
+            this.ruleProbabilities = ruleProbabilities;
+            this.noneProbability = noneProbability;
+        }
+    }
+
+    public static class Judgement {
+        public final TopicProbabilities topics;
         public final double cost;
         public final long inputTokens;
         public final long elapsedMillis;
 
-        Judgement(double[] probabilities, double cost, long inputTokens, long elapsedMillis) {
-            this.probabilities = probabilities;
+        Judgement(TopicProbabilities topics, double cost, long inputTokens, long elapsedMillis) {
+            this.topics = topics;
             this.cost = cost;
             this.inputTokens = inputTokens;
             this.elapsedMillis = elapsedMillis;
@@ -47,36 +61,42 @@ public class ClefClient {
         }
     }
 
+    // All rules go into one choice question: measured on clef-flash, 5 rules cost 267 input tokens
+    // this way versus 553 as separate yes/no questions, with near-identical judgements.
     public static Judgement judge(TimelineTweet tweet, List<FilterRule> rules, String apiKey, int timeoutMillis) throws Exception {
         long startedAt = System.currentTimeMillis();
-        JSONObject questions = new JSONObject();
+        JSONObject criteria = new JSONObject().put(NONE_OPTION, "None of the descriptions");
         for (int index = 0; index < rules.size(); index++) {
-            questions.put(questionId(index), new JSONObject()
-                    .put("type", "noul")
-                    .put("instructions", "Does this post match the following description? " + rules.get(index).text));
+            criteria.put(optionId(index), rules.get(index).text);
         }
 
         JSONObject request = new JSONObject()
                 .put("model", MODEL)
                 .put("provider", new JSONObject().put("data_collection", "deny"))
                 .put("state", tweet.toClefState())
-                .put("questions", questions);
+                .put("questions", new JSONObject().put(TOPIC_QUESTION, new JSONObject()
+                        .put("type", "choice")
+                        .put("instructions", "Which description does this post match?")
+                        .put("criteria", criteria)));
 
         JSONObject response = post(request, apiKey, timeoutMillis);
 
-        JSONObject answers = response.getJSONObject("answers");
-        double[] probabilities = new double[rules.size()];
+        JSONObject probabilities = response.getJSONObject("answers")
+                .getJSONObject(TOPIC_QUESTION)
+                .getJSONObject("probabilities");
+        double[] ruleProbabilities = new double[rules.size()];
         for (int index = 0; index < rules.size(); index++) {
-            probabilities[index] = answers.getJSONObject(questionId(index)).getDouble("noul");
+            ruleProbabilities[index] = probabilities.optDouble(optionId(index), 0);
         }
+        TopicProbabilities topics = new TopicProbabilities(ruleProbabilities, probabilities.optDouble(NONE_OPTION, 1));
 
         JSONObject usage = response.optJSONObject("usage");
         double cost = usage == null ? 0 : usage.optDouble("cost", 0);
         long inputTokens = usage == null ? 0 : usage.optLong("input_tokens", 0);
-        return new Judgement(probabilities, cost, inputTokens, System.currentTimeMillis() - startedAt);
+        return new Judgement(topics, cost, inputTokens, System.currentTimeMillis() - startedAt);
     }
 
-    private static String questionId(int ruleIndex) {
+    private static String optionId(int ruleIndex) {
         return "rule_" + ruleIndex;
     }
 
