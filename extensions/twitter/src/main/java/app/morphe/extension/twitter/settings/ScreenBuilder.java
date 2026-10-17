@@ -1250,14 +1250,7 @@ public class ScreenBuilder {
             int ruleNumber = slot + 1;
             StringSetting ruleTextSetting = Settings.aiFilterRuleText(accountId, slot);
             StringSetting thresholdSetting = Settings.aiFilterRuleThreshold(accountId, slot);
-            String ruleText = Utils.getStringPref(ruleTextSetting);
-            addPreference(category,
-                    helper.editTextPreference(
-                            String.format(str("piko_pref_ai_filter_rule"), ruleNumber),
-                            ruleText.isEmpty() ? str("piko_pref_ai_filter_rule_empty") : ruleText,
-                            ruleTextSetting
-                    )
-            );
+            addPreference(category, ruleTextPreference(ruleNumber, ruleTextSetting));
             addPreference(category,
                     helper.editTextPreference(
                             String.format(str("piko_pref_ai_filter_rule_threshold"), ruleNumber),
@@ -1266,6 +1259,25 @@ public class ScreenBuilder {
                     )
             );
         }
+    }
+
+    // The default text preference shows the saved value as its summary, which is blank once the rule is cleared.
+    private Preference ruleTextPreference(int ruleNumber, StringSetting ruleTextSetting) {
+        Preference preference = helper.editTextPreference(
+                String.format(str("piko_pref_ai_filter_rule"), ruleNumber),
+                ruleTextSummary(Utils.getStringPref(ruleTextSetting)),
+                ruleTextSetting
+        );
+        preference.setOnPreferenceChangeListener((changedPreference, newValue) -> {
+            helper.setValue(changedPreference, newValue);
+            changedPreference.setSummary(ruleTextSummary((String) newValue));
+            return true;
+        });
+        return preference;
+    }
+
+    private static String ruleTextSummary(String ruleText) {
+        return ruleText.trim().isEmpty() ? str("piko_pref_ai_filter_rule_empty") : ruleText;
     }
 
     // The default text preference shows the saved value as its summary, which would expose the key.
