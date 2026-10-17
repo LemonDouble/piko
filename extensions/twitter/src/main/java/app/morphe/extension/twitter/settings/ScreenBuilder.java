@@ -1214,6 +1214,16 @@ public class ScreenBuilder {
                     )
             );
         }
+
+        addPreference(category,
+                helper.buttonPreference(
+                        str("piko_pref_ai_filter_reset_usage"),
+                        str("piko_pref_ai_filter_reset_usage_desc"),
+                        Settings.AI_FILTER_RESET_USAGE,
+                        "ic_vector_trashcan_stroke",
+                        "#DE0025"
+                )
+        );
     }
 
     private Preference aiFilterAccountInfoPreference(@Nullable String accountId) {

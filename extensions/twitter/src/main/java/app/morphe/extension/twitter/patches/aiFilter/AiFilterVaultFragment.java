@@ -86,6 +86,18 @@ public class AiFilterVaultFragment extends Fragment {
                 .show();
     }
 
+    public static void showResetUsageDialog(Context context) {
+        new AlertDialog.Builder(context)
+                .setTitle(str("piko_pref_ai_filter_reset_usage"))
+                .setMessage(str("piko_ai_filter_reset_usage_confirm"))
+                .setPositiveButton(str("ok"), (dialog, which) -> {
+                    FilterVault.resetUsage();
+                    PikoUtils.toast(str("piko_ai_filter_reset_usage_done"));
+                })
+                .setNegativeButton(str("cancel"), null)
+                .show();
+    }
+
     private static String usageSummary() {
         UsageStats usage = FilterVault.getTodayUsage();
         StringBuilder summary = new StringBuilder()

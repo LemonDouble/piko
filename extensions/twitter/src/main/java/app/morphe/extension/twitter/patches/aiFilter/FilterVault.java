@@ -69,11 +69,20 @@ public class FilterVault {
     public static synchronized void recordUsage(UsageStats batch) {
         UsageStats today = getTodayUsage();
         today.add(batch);
+        recordUsageAsToday(today);
+    }
+
+    private static void recordUsageAsToday(UsageStats usage) {
         try {
-            writeFile(USAGE_FILE, today.toJson().put("date", LocalDate.now().toString()).toString());
+            writeFile(USAGE_FILE, usage.toJson().put("date", LocalDate.now().toString()).toString());
         } catch (Exception ex) {
             PikoUtils.logger(ex);
         }
+    }
+
+    // Lets the user start a fresh measurement before the day ends.
+    public static synchronized void resetUsage() {
+        recordUsageAsToday(new UsageStats());
     }
 
     public static synchronized UsageStats getTodayUsage() {

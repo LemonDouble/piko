@@ -287,6 +287,10 @@
     <string name="piko_pref_ai_filter_clear_vault_desc">현재 계정의 보관함 기록만 지웁니다. 오늘의 사용량과 비용 기록은 남습니다.</string>
     <string name="piko_ai_filter_clear_vault_confirm">현재 계정의 걸러진 게시물 기록 %d개를 지울까요? 이미 숨겨진 게시물이 타임라인에 다시 나타나지는 않습니다.</string>
     <string name="piko_ai_filter_clear_vault_done">걸러진 게시물 기록을 지웠습니다.</string>
+    <string name="piko_pref_ai_filter_reset_usage">오늘 사용량 초기화</string>
+    <string name="piko_pref_ai_filter_reset_usage_desc">판별 수, 실패, 토큰, 비용, 지연 시간 기록을 0부터 다시 셉니다. 모든 계정의 사용량이 함께 초기화되고, 보관함 기록은 남습니다.</string>
+    <string name="piko_ai_filter_reset_usage_confirm">오늘 사용량 기록을 초기화할까요? 모든 계정의 사용량이 함께 초기화됩니다. OpenRouter에서 실제로 청구된 금액은 바뀌지 않습니다.</string>
+    <string name="piko_ai_filter_reset_usage_done">사용량 기록을 초기화했습니다.</string>
     <string name="piko_ai_filter_vault_empty">아직 걸러진 게시물이 없습니다.</string>
     <string name="piko_ai_filter_vault_usage">오늘: 판별 %1$d건 · 입력 %2$d 토큰 · $%3$.4f (약 %4$.1f원)</string>
     <string name="piko_ai_filter_vault_monthly_estimate">한 달 예상(오늘 비용 × 30일): $%1$.2f (약 %2$,.0f원)</string>

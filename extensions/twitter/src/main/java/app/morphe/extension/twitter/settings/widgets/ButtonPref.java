@@ -139,6 +139,8 @@ public class ButtonPref extends Preference {
                         fragment = new AiFilterVaultFragment();
                     } else if (key.equals(Settings.AI_FILTER_CLEAR_VAULT)) {
                         AiFilterVaultFragment.showClearDialog(context);
+                    } else if (key.equals(Settings.AI_FILTER_RESET_USAGE)) {
+                        AiFilterVaultFragment.showResetUsageDialog(context);
                     } else if (key.equals(Settings.IMPORT_LOGIN_TOKEN)) {
                         new ImportLoginTokenDialogFragment().show(((Activity) context).getFragmentManager(), null);
                     } else if (key.equals(Settings.EXPORT_LOGIN_TOKEN)) {

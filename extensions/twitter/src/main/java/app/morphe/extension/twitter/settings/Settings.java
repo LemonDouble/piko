@@ -161,6 +161,7 @@ public class Settings {
     public static final String SUPPORTED_LINKS = "piko_settings_supported_links";
     public static final String AI_FILTER_VAULT = "ai_filter_vault";
     public static final String AI_FILTER_CLEAR_VAULT = "ai_filter_clear_vault";
+    public static final String AI_FILTER_RESET_USAGE = "ai_filter_reset_usage";
 
     public static final String PREMIUM_SECTION = "premium_section";
     public static final String DOWNLOAD_SECTION = "download_section";
