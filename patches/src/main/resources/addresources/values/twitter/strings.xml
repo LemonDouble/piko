@@ -297,7 +297,8 @@
     <string name="piko_ai_filter_vault_failures">실패 %1$d건 (시간 초과 %2$d · HTTP 오류 %3$d · 기타 %4$d)</string>
     <string name="piko_ai_filter_vault_latency">평균 판별 %1$d ms · 타임라인 대기 평균 %2$d ms</string>
     <string name="piko_ai_filter_vault_last_error">마지막 오류: %s</string>
-    <string name="piko_ai_filter_vault_meta">%1$s · 확률 %2$.2f · 미디어 %3$d개 · %4$s</string>
+    <string name="piko_ai_filter_vault_filter_chip">%1$s · %2$.2f</string>
+    <string name="piko_ai_filter_vault_media">사진/영상 %d개</string>
     <string name="piko_ai_filter_vault_quote">인용:</string>
     <string name="piko_ai_filter_vault_original">원문:</string>
     <string name="piko_ai_filter_vault_retweeted_by">@%s 님이 재게시</string>
