@@ -1,6 +1,6 @@
 {
-  "created_at": "2026-10-17T08:03:24",
-  "description": "AI 타임라인 필터 포함 빌드: 24c71b2 perf(Twitter): AI 필터에 보내는 본문과 인용 글을 2,000자로 제한",
-  "download_url": "https://github.com/LemonDouble/piko/releases/download/v3.10.0-dev.14-ai.7/patches-3.10.0-dev.14-ai.7.mpp",
-  "version": "3.10.0-dev.14-ai.7"
+  "created_at": "2026-10-17T08:08:34",
+  "description": "AI 타임라인 필터 포함 빌드: 8e7d300 feat(Twitter): AI 필터 보관함에 번역을 우선 표시",
+  "download_url": "https://github.com/LemonDouble/piko/releases/download/v3.10.0-dev.14-ai.8/patches-3.10.0-dev.14-ai.8.mpp",
+  "version": "3.10.0-dev.14-ai.8"
 }
