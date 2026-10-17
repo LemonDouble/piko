@@ -121,11 +121,11 @@ public class FilterVault {
         return new File(Utils.getContext().getFilesDir(), name);
     }
 
-    private static String readFile(String name) throws Exception {
+    static String readFile(String name) throws Exception {
         return new String(Files.readAllBytes(fileOf(name).toPath()), StandardCharsets.UTF_8);
     }
 
-    private static void writeFile(String name, String content) {
+    static void writeFile(String name, String content) {
         try (FileOutputStream output = new FileOutputStream(fileOf(name))) {
             output.write(content.getBytes(StandardCharsets.UTF_8));
         } catch (Exception ex) {

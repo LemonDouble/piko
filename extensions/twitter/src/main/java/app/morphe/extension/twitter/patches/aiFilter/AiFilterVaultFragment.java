@@ -102,7 +102,7 @@ public class AiFilterVaultFragment extends Fragment {
         UsageStats usage = FilterVault.getTodayUsage();
         StringBuilder summary = new StringBuilder()
                 .append(String.format(Locale.US, str("piko_ai_filter_vault_usage"),
-                        usage.judged, usage.inputTokens, usage.cost, usage.cost * KRW_PER_USD))
+                        usage.judged, usage.cacheHits, usage.inputTokens, usage.cost, usage.cost * KRW_PER_USD))
                 .append('\n')
                 .append(String.format(Locale.US, str("piko_ai_filter_vault_monthly_estimate"),
                         usage.cost * DAYS_PER_MONTH, usage.cost * DAYS_PER_MONTH * KRW_PER_USD))

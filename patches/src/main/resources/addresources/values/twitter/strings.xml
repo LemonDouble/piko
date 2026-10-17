@@ -292,7 +292,7 @@
     <string name="piko_ai_filter_reset_usage_confirm">오늘 사용량 기록을 초기화할까요? 모든 계정의 사용량이 함께 초기화됩니다. OpenRouter에서 실제로 청구된 금액은 바뀌지 않습니다.</string>
     <string name="piko_ai_filter_reset_usage_done">사용량 기록을 초기화했습니다.</string>
     <string name="piko_ai_filter_vault_empty">아직 걸러진 게시물이 없습니다.</string>
-    <string name="piko_ai_filter_vault_usage">오늘: 판별 %1$d건 · 입력 %2$d 토큰 · $%3$.4f (약 %4$.1f원)</string>
+    <string name="piko_ai_filter_vault_usage">오늘: 판별 %1$d건 · 캐시 재사용 %2$d건 · 입력 %3$d 토큰 · $%4$.4f (약 %5$.1f원)</string>
     <string name="piko_ai_filter_vault_monthly_estimate">한 달 예상(오늘 비용 × 30일): $%1$.2f (약 %2$,.0f원)</string>
     <string name="piko_ai_filter_vault_failures">실패 %1$d건 (시간 초과 %2$d · HTTP 오류 %3$d · 기타 %4$d)</string>
     <string name="piko_ai_filter_vault_latency">평균 판별 %1$d ms · 타임라인 대기 평균 %2$d ms</string>

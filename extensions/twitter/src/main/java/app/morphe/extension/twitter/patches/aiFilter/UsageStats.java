@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 public class UsageStats {
     public int judged;
+    public int cacheHits;
     public int timeouts;
     public int httpErrors;
     public int otherErrors;
@@ -36,6 +37,7 @@ public class UsageStats {
 
     void add(UsageStats other) {
         judged += other.judged;
+        cacheHits += other.cacheHits;
         timeouts += other.timeouts;
         httpErrors += other.httpErrors;
         otherErrors += other.otherErrors;
@@ -50,6 +52,7 @@ public class UsageStats {
     JSONObject toJson() throws JSONException {
         return new JSONObject()
                 .put("judged", judged)
+                .put("cache_hits", cacheHits)
                 .put("timeouts", timeouts)
                 .put("http_errors", httpErrors)
                 .put("other_errors", otherErrors)
@@ -64,6 +67,7 @@ public class UsageStats {
     static UsageStats fromJson(JSONObject json) {
         UsageStats stats = new UsageStats();
         stats.judged = json.optInt("judged");
+        stats.cacheHits = json.optInt("cache_hits");
         stats.timeouts = json.optInt("timeouts");
         stats.httpErrors = json.optInt("http_errors");
         stats.otherErrors = json.optInt("other_errors");

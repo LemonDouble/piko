@@ -48,17 +48,9 @@ public class AiTimelineFilter {
     private static final String TIMELINE_RESPONSE_KEY = "timeline_response";
     private static final Set<String> HOME_PAGES = new HashSet<>(Arrays.asList("for_you", "following"));
     private static final int MAX_PARALLEL_REQUESTS = 16;
-    private static final int MAX_CACHED_JUDGEMENTS = 2000;
     private static final int DEFAULT_TIMEOUT_MILLIS = 3000;
 
     private static final ExecutorService executor = Executors.newFixedThreadPool(MAX_PARALLEL_REQUESTS);
-
-    private static final Map<String, ClefClient.TopicProbabilities> probabilityCache = new LinkedHashMap<>(16, 0.75f, true) {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<String, ClefClient.TopicProbabilities> eldest) {
-            return size() > MAX_CACHED_JUDGEMENTS;
-        }
-    };
 
     private static class Match {
         final FilterRule rule;
@@ -199,10 +191,7 @@ public class AiTimelineFilter {
         Map<String, ClefClient.TopicProbabilities> probabilitiesById = new HashMap<>();
         List<TimelineTweet> uncachedTweets = new ArrayList<>();
         for (TimelineTweet tweet : tweets) {
-            ClefClient.TopicProbabilities cached;
-            synchronized (probabilityCache) {
-                cached = probabilityCache.get(tweet.id + signature);
-            }
+            ClefClient.TopicProbabilities cached = JudgementCache.get(tweet.id, signature);
             if (cached != null) {
                 probabilitiesById.put(tweet.id, cached);
             } else {
@@ -220,14 +209,14 @@ public class AiTimelineFilter {
 
         UsageStats usage = new UsageStats();
         usage.judged = uncachedTweets.size();
+        usage.cacheHits = tweets.size() - uncachedTweets.size();
+        Map<String, ClefClient.TopicProbabilities> newlyJudged = new HashMap<>();
         for (int index = 0; index < results.size(); index++) {
             TimelineTweet tweet = uncachedTweets.get(index);
             try {
                 ClefClient.Judgement judgement = results.get(index).get();
                 probabilitiesById.put(tweet.id, judgement.topics);
-                synchronized (probabilityCache) {
-                    probabilityCache.put(tweet.id + signature, judgement.topics);
-                }
+                newlyJudged.put(tweet.id, judgement.topics);
                 usage.cost += judgement.cost;
                 usage.inputTokens += judgement.inputTokens;
                 usage.judgeMillisTotal += judgement.elapsedMillis;
@@ -238,6 +227,7 @@ public class AiTimelineFilter {
                 recordFailure(usage, ex.getCause());
             }
         }
+        JudgementCache.putAll(newlyJudged, signature);
         usage.timelineResponses = 1;
         usage.waitMillisTotal = System.currentTimeMillis() - startedAt;
         FilterVault.recordUsage(usage);
