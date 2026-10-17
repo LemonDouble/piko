@@ -299,6 +299,7 @@
     <string name="piko_ai_filter_vault_last_error">마지막 오류: %s</string>
     <string name="piko_ai_filter_vault_meta">%1$s · 확률 %2$.2f · 미디어 %3$d개 · %4$s</string>
     <string name="piko_ai_filter_vault_quote">인용:</string>
+    <string name="piko_ai_filter_vault_original">원문:</string>
     <string name="piko_ai_filter_vault_retweeted_by">@%s 님이 재게시</string>
 
     <!-- Backup and Restore -->

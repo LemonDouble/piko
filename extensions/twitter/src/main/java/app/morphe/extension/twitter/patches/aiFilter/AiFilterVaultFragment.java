@@ -152,11 +152,21 @@ public class AiFilterVaultFragment extends Fragment {
 
             row.addView(textView(context, authorLine(item), 14, primaryTextColor(context)));
 
-            TextView body = textView(context, item.optString("text"), 15, primaryTextColor(context));
+            String translatedText = item.optString("translated_text");
+            String bodyText = translatedText.isEmpty() ? item.optString("text") : translatedText;
+            TextView body = textView(context, bodyText, 15, primaryTextColor(context));
             body.setPadding(0, dp(context, 4), 0, 0);
             row.addView(body);
 
-            String quotedText = item.optString("quoted_text");
+            if (!translatedText.isEmpty()) {
+                TextView original = textView(context, str("piko_ai_filter_vault_original") + " " + item.optString("text"), 12, secondaryTextColor(context));
+                original.setMaxLines(3);
+                original.setEllipsize(TextUtils.TruncateAt.END);
+                original.setPadding(0, dp(context, 4), 0, 0);
+                row.addView(original);
+            }
+
+            String quotedText = item.optString("quoted_translated_text", item.optString("quoted_text"));
             if (!quotedText.isEmpty()) {
                 TextView quote = textView(context, str("piko_ai_filter_vault_quote") + " " + quotedText, 13, secondaryTextColor(context));
                 quote.setMaxLines(3);

@@ -22,21 +22,25 @@ public class TimelineTweet {
     public final String authorName;
     public final String authorHandle;
     public final String text;
+    // X attaches a translation into the viewer's language to most foreign-language posts.
     @Nullable
-    public final String quotedText;
+    public final String translatedText;
+    @Nullable
+    public final TimelineTweet quoted;
     public final int mediaCount;
     @Nullable
     public final String retweetedBy;
     public final boolean authorFollowedByMe;
 
     private TimelineTweet(String id, String authorName, String authorHandle, String text,
-                          @Nullable String quotedText, int mediaCount, @Nullable String retweetedBy,
-                          boolean authorFollowedByMe) {
+                          @Nullable String translatedText, @Nullable TimelineTweet quoted, int mediaCount,
+                          @Nullable String retweetedBy, boolean authorFollowedByMe) {
         this.id = id;
         this.authorName = authorName;
         this.authorHandle = authorHandle;
         this.text = text;
-        this.quotedText = quotedText;
+        this.translatedText = translatedText;
+        this.quoted = quoted;
         this.mediaCount = mediaCount;
         this.retweetedBy = retweetedBy;
         this.authorFollowedByMe = authorFollowedByMe;
@@ -85,7 +89,6 @@ public class TimelineTweet {
         }
 
         TimelineTweet quoted = fromResult(resultOf(result.optJSONObject("quoted_status_result")), null);
-        String quotedText = quoted == null ? null : quoted.text;
 
         JSONObject extendedEntities = legacy.optJSONObject("extended_entities");
         JSONArray media = extendedEntities == null ? null : extendedEntities.optJSONArray("media");
@@ -95,11 +98,21 @@ public class TimelineTweet {
                 author.optString("name"),
                 author.optString("screen_name"),
                 fullTextOf(result, legacy),
-                quotedText,
+                translationOf(result),
+                quoted,
                 media == null ? 0 : media.length(),
                 retweetedBy,
                 author.optBoolean("following")
         );
+    }
+
+    // "preview_translation" only covers the opening of long posts, so the full "translation" is used.
+    @Nullable
+    private static String translationOf(JSONObject result) {
+        JSONObject translated = result.optJSONObject("grok_translated_post_with_availability");
+        JSONObject data = translated == null ? null : translated.optJSONObject("data");
+        String translation = data == null ? "" : data.optString("translation");
+        return translation.isEmpty() ? null : translation;
     }
 
     @Nullable
@@ -137,7 +150,7 @@ public class TimelineTweet {
         JSONObject state = new JSONObject();
         state.put("author", authorName + " (@" + authorHandle + ")");
         state.put("text", truncatedForClef(text));
-        if (quotedText != null) state.put("quoted_post", truncatedForClef(quotedText));
+        if (quoted != null) state.put("quoted_post", truncatedForClef(quoted.text));
         state.put("media_count", mediaCount);
         return state;
     }
@@ -156,7 +169,11 @@ public class TimelineTweet {
         item.put("author_name", authorName);
         item.put("author_handle", authorHandle);
         item.put("text", text);
-        if (quotedText != null) item.put("quoted_text", quotedText);
+        if (translatedText != null) item.put("translated_text", translatedText);
+        if (quoted != null) {
+            item.put("quoted_text", quoted.text);
+            if (quoted.translatedText != null) item.put("quoted_translated_text", quoted.translatedText);
+        }
         item.put("media_count", mediaCount);
         if (retweetedBy != null) item.put("retweeted_by", retweetedBy);
         item.put("filter", filterText);
