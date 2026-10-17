@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TimelineTweet {
+    private static final int MAX_CLEF_TEXT_CODE_POINTS = 2000;
+
     public final String id;
     public final String authorName;
     public final String authorHandle;
@@ -134,10 +136,17 @@ public class TimelineTweet {
     public JSONObject toClefState() throws JSONException {
         JSONObject state = new JSONObject();
         state.put("author", authorName + " (@" + authorHandle + ")");
-        state.put("text", text);
-        if (quotedText != null) state.put("quoted_post", quotedText);
+        state.put("text", truncatedForClef(text));
+        if (quotedText != null) state.put("quoted_post", truncatedForClef(quotedText));
         state.put("media_count", mediaCount);
         return state;
+    }
+
+    // Caps the cost of very long posts (up to 25,000 characters) at about 1,000 tokens each;
+    // the opening of a post is enough to judge its topic.
+    private static String truncatedForClef(String value) {
+        if (value.codePointCount(0, value.length()) <= MAX_CLEF_TEXT_CODE_POINTS) return value;
+        return value.substring(0, value.offsetByCodePoints(0, MAX_CLEF_TEXT_CODE_POINTS));
     }
 
     public JSONObject toVaultItem(String accountId, String filterText, double probability, long filteredAtMillis) throws JSONException {
