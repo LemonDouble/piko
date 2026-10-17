@@ -135,6 +135,7 @@ public class ActivityHook {
             case Settings.READER_MODE_KEY -> "piko_title_native_reader_mode";
             case Settings.CHANGE_APP_ICON -> "piko_pref_customisation_change_app_icon";
             case Settings.EXPORT_LOGIN_TOKEN -> "piko_pref_export_login_token";
+            case Settings.AI_FILTER_VAULT -> "piko_pref_ai_filter_vault";
             default -> "piko_title_settings";
         };
         return ResourceUtils.getString(toolbarText);

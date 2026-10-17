@@ -11,6 +11,7 @@ import static app.morphe.extension.shared.StringRef.str;
 import android.content.Context;
 import android.preference.PreferenceScreen;
 import android.preference.Preference;
+import android.text.InputType;
 import android.text.TextUtils;
 
 import com.twitter.ui.widget.LegacyTwitterPreferenceCategory;
@@ -22,7 +23,10 @@ import app.morphe.extension.twitter.settings.SettingsSearchMatcher.SearchResult;
 import app.morphe.extension.twitter.settings.widgets.*;
 import androidx.annotation.Nullable;
 
+import app.morphe.extension.crimera.settings.StringSetting;
 import app.morphe.extension.twitter.Pref;
+import app.morphe.extension.twitter.Utils;
+import app.morphe.extension.twitter.patches.aiFilter.CurrentAccount;
 
 
 public class ScreenBuilder {
@@ -98,6 +102,14 @@ public class ScreenBuilder {
                     "ic_vector_timeline_stroke",
                     SettingsStatus::enableTimelineSection,
                     ScreenBuilder::buildTimelineSection
+            ),
+            new SettingsSection(
+                    "piko_title_ai_filter",
+                    null,
+                    Settings.AI_FILTER_SECTION,
+                    "ic_vector_timeline_stroke",
+                    () -> SettingsStatus.aiTimelineFilter,
+                    ScreenBuilder::buildAiFilterSection
             ),
             new SettingsSection(
                     "piko_title_logging",
@@ -1158,6 +1170,122 @@ public class ScreenBuilder {
             );
         }
 
+    }
+
+    public void buildAiFilterSection(boolean buildCategory) {
+        if (!SettingsStatus.aiTimelineFilter) return;
+
+        LegacyTwitterPreferenceCategory category = null;
+        if (buildCategory)
+            category = preferenceCategory(str("piko_title_ai_filter"));
+
+        String accountId = CurrentAccount.id();
+        addPreference(category, aiFilterAccountInfoPreference(accountId));
+        if (accountId != null) {
+            buildAiFilterAccountPreferences(category, accountId);
+        }
+
+        addPreference(category, apiKeyPreference());
+
+        addPreference(category,
+                helper.editTextNumPreference(
+                        str("piko_pref_ai_filter_timeout"),
+                        Utils.getStringPref(Settings.AI_FILTER_TIMEOUT_MILLIS),
+                        Settings.AI_FILTER_TIMEOUT_MILLIS
+                )
+        );
+
+        addPreference(category,
+                helper.buttonPreference(
+                        str("piko_pref_ai_filter_vault"),
+                        str("piko_pref_ai_filter_vault_desc"),
+                        Settings.AI_FILTER_VAULT
+                )
+        );
+
+        if (accountId != null) {
+            addPreference(category,
+                    helper.buttonPreference(
+                            str("piko_pref_ai_filter_clear_vault"),
+                            str("piko_pref_ai_filter_clear_vault_desc"),
+                            Settings.AI_FILTER_CLEAR_VAULT,
+                            "ic_vector_trashcan_stroke",
+                            "#DE0025"
+                    )
+            );
+        }
+    }
+
+    private Preference aiFilterAccountInfoPreference(@Nullable String accountId) {
+        Preference preference = new Preference(context);
+        preference.setSelectable(false);
+        preference.setSingleLineTitle(false);
+        if (accountId == null) {
+            preference.setTitle(str("piko_ai_filter_account_unknown"));
+        } else {
+            preference.setTitle(String.format(str("piko_pref_ai_filter_account"), accountId));
+            preference.setSummary(str("piko_pref_ai_filter_account_desc"));
+        }
+        return preference;
+    }
+
+    private void buildAiFilterAccountPreferences(@Nullable LegacyTwitterPreferenceCategory category, String accountId) {
+        addPreference(category,
+                helper.switchPreference(
+                        str("piko_pref_ai_filter_enable"),
+                        str("piko_pref_ai_filter_enable_desc"),
+                        Settings.aiFilterEnabled(accountId)
+                )
+        );
+
+        addPreference(category,
+                helper.switchPreference(
+                        str("piko_pref_ai_filter_skip_following"),
+                        str("piko_pref_ai_filter_skip_following_desc"),
+                        Settings.aiFilterSkipFollowing(accountId)
+                )
+        );
+
+        for (int slot = 0; slot < Settings.AI_FILTER_RULE_SLOTS; slot++) {
+            int ruleNumber = slot + 1;
+            StringSetting ruleTextSetting = Settings.aiFilterRuleText(accountId, slot);
+            StringSetting thresholdSetting = Settings.aiFilterRuleThreshold(accountId, slot);
+            String ruleText = Utils.getStringPref(ruleTextSetting);
+            addPreference(category,
+                    helper.editTextPreference(
+                            String.format(str("piko_pref_ai_filter_rule"), ruleNumber),
+                            ruleText.isEmpty() ? str("piko_pref_ai_filter_rule_empty") : ruleText,
+                            ruleTextSetting
+                    )
+            );
+            addPreference(category,
+                    helper.editTextPreference(
+                            String.format(str("piko_pref_ai_filter_rule_threshold"), ruleNumber),
+                            Utils.getStringPref(thresholdSetting),
+                            thresholdSetting
+                    )
+            );
+        }
+    }
+
+    // The default text preference shows the saved value as its summary, which would expose the key.
+    private Preference apiKeyPreference() {
+        EditTextPref preference = (EditTextPref) helper.editTextPreference(
+                str("piko_pref_ai_filter_api_key"),
+                apiKeySummary(Utils.getStringPref(Settings.AI_FILTER_API_KEY)),
+                Settings.AI_FILTER_API_KEY
+        );
+        preference.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        preference.setOnPreferenceChangeListener((changedPreference, newValue) -> {
+            helper.setValue(changedPreference, newValue);
+            changedPreference.setSummary(apiKeySummary((String) newValue));
+            return true;
+        });
+        return preference;
+    }
+
+    private static String apiKeySummary(String apiKey) {
+        return str(apiKey.trim().isEmpty() ? "piko_pref_ai_filter_api_key_empty" : "piko_pref_ai_filter_api_key_saved");
     }
 
     public void buildExportSection(boolean buildCategory){

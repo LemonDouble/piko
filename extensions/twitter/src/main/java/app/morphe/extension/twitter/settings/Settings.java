@@ -118,6 +118,27 @@ public class Settings {
     public static final BooleanSetting LOG_RES = new BooleanSetting("logging_response", false);
     public static final BooleanSetting LOG_RES_OVRD = new BooleanSetting("logging_response_overwrite_file", false);
 
+    public static final StringSetting AI_FILTER_API_KEY = new StringSetting("ai_filter_api_key", "");
+    public static final StringSetting AI_FILTER_TIMEOUT_MILLIS = new StringSetting("ai_filter_timeout_millis", "3000");
+    public static final int AI_FILTER_RULE_SLOTS = 3;
+
+    // AI filter settings below are stored per logged-in X account.
+    public static BooleanSetting aiFilterEnabled(String accountId) {
+        return new BooleanSetting("ai_filter_enabled_" + accountId, false);
+    }
+
+    public static BooleanSetting aiFilterSkipFollowing(String accountId) {
+        return new BooleanSetting("ai_filter_skip_following_" + accountId, true);
+    }
+
+    public static StringSetting aiFilterRuleText(String accountId, int slot) {
+        return new StringSetting("ai_filter_rule_" + (slot + 1) + "_text_" + accountId, "");
+    }
+
+    public static StringSetting aiFilterRuleThreshold(String accountId, int slot) {
+        return new StringSetting("ai_filter_rule_" + (slot + 1) + "_threshold_" + accountId, "0.8");
+    }
+
     public static final String EXPORT_PREF = "export_pref";
     public static final String EXPORT_FLAGS = "export_flags";
     public static final String IMPORT_PREF = "import_pref";
@@ -138,6 +159,8 @@ public class Settings {
     public static final String PIKO_PATCHES = "piko_title_piko_patches";
     public static final String CHANGELOGS_TITLE = "piko_changelogs_title";
     public static final String SUPPORTED_LINKS = "piko_settings_supported_links";
+    public static final String AI_FILTER_VAULT = "ai_filter_vault";
+    public static final String AI_FILTER_CLEAR_VAULT = "ai_filter_clear_vault";
 
     public static final String PREMIUM_SECTION = "premium_section";
     public static final String DOWNLOAD_SECTION = "download_section";
@@ -148,6 +171,7 @@ public class Settings {
     public static final String FONT_SECTION = "font_section";
     public static final String TIMELINE_SECTION = "timeline_section";
     public static final String LOGGING_SECTION = "logging_section";
+    public static final String AI_FILTER_SECTION = "ai_filter_section";
     public static final String BACKUP_SECTION = "backup_section";
     public static final String NATIVE_SECTION = "native_section";
     public static final String READER_MODE_KEY = "readerMode";

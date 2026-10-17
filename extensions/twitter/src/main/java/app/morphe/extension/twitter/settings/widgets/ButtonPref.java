@@ -25,6 +25,7 @@ import app.morphe.extension.crimera.PikoUtils;
 
 import app.morphe.extension.twitter.patches.Changelogs;
 import app.morphe.extension.twitter.patches.DatabasePatch;
+import app.morphe.extension.twitter.patches.aiFilter.AiFilterVaultFragment;
 import app.morphe.extension.twitter.patches.customise.appIcon.IconSelectorFragment;
 import app.morphe.extension.twitter.patches.customise.font.FontPickerFragment;
 import app.morphe.extension.twitter.patches.customise.font.UpdateFont;
@@ -134,6 +135,10 @@ public class ButtonPref extends Preference {
                         ReaderModeUtils.clearCache();
                     } else if (key.equals(Settings.CHANGE_APP_ICON)) {
                         fragment = new IconSelectorFragment();
+                    } else if (key.equals(Settings.AI_FILTER_VAULT)) {
+                        fragment = new AiFilterVaultFragment();
+                    } else if (key.equals(Settings.AI_FILTER_CLEAR_VAULT)) {
+                        AiFilterVaultFragment.showClearDialog(context);
                     } else if (key.equals(Settings.IMPORT_LOGIN_TOKEN)) {
                         new ImportLoginTokenDialogFragment().show(((Activity) context).getFragmentManager(), null);
                     } else if (key.equals(Settings.EXPORT_LOGIN_TOKEN)) {

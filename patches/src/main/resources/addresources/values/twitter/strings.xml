@@ -265,6 +265,38 @@
     <string name="piko_pref_server_response_logging_file_overwrite">Overwrite response log file</string>
     <string name="piko_pref_server_response_logging_file_overwrite_desc">Clear existing response log data on launch</string>
 
+    <!-- AI Timeline Filter -->
+    <string name="piko_title_ai_filter">AI 타임라인 필터</string>
+    <string name="piko_pref_ai_filter_enable">AI 타임라인 필터 사용</string>
+    <string name="piko_pref_ai_filter_enable_desc">홈 타임라인의 게시물을 Clef Flash로 판별해서, 필터에 해당하는 게시물을 숨깁니다.</string>
+    <string name="piko_pref_ai_filter_account">현재 계정(ID %s)의 설정</string>
+    <string name="piko_pref_ai_filter_account_desc">필터 사용, 팔로잉 제외, 필터 문구와 기준 확률은 계정마다 따로 저장됩니다. API 키와 시간 제한은 모든 계정이 같이 씁니다.</string>
+    <string name="piko_ai_filter_account_unknown">현재 로그인된 계정을 확인할 수 없어서 필터를 사용할 수 없습니다.</string>
+    <string name="piko_pref_ai_filter_skip_following">팔로잉 계정은 판별하지 않음</string>
+    <string name="piko_pref_ai_filter_skip_following_desc">내가 팔로우하는 계정의 게시물은 판별 없이 그대로 보여 줍니다. 재게시는 원본 작성자를 기준으로 판단합니다.</string>
+    <string name="piko_pref_ai_filter_api_key">OpenRouter API 키</string>
+    <string name="piko_pref_ai_filter_api_key_empty">입력되지 않았습니다</string>
+    <string name="piko_pref_ai_filter_api_key_saved">저장되어 있습니다</string>
+    <string name="piko_pref_ai_filter_rule">필터 %d</string>
+    <string name="piko_pref_ai_filter_rule_empty">비어 있으면 사용하지 않습니다</string>
+    <string name="piko_pref_ai_filter_rule_threshold">필터 %d 기준 확률 (0~1)</string>
+    <string name="piko_pref_ai_filter_timeout">판별 시간 제한 (밀리초)</string>
+    <string name="piko_pref_ai_filter_vault">걸러진 게시물 보관함</string>
+    <string name="piko_pref_ai_filter_vault_desc">최근 7일, 최대 1,000개를 보관합니다</string>
+    <string name="piko_pref_ai_filter_clear_vault">걸러진 게시물 기록 지우기</string>
+    <string name="piko_pref_ai_filter_clear_vault_desc">현재 계정의 보관함 기록만 지웁니다. 오늘의 사용량과 비용 기록은 남습니다.</string>
+    <string name="piko_ai_filter_clear_vault_confirm">현재 계정의 걸러진 게시물 기록 %d개를 지울까요? 이미 숨겨진 게시물이 타임라인에 다시 나타나지는 않습니다.</string>
+    <string name="piko_ai_filter_clear_vault_done">걸러진 게시물 기록을 지웠습니다.</string>
+    <string name="piko_ai_filter_vault_empty">아직 걸러진 게시물이 없습니다.</string>
+    <string name="piko_ai_filter_vault_usage">오늘: 판별 %1$d건 · 입력 %2$d 토큰 · $%3$.4f (약 %4$.1f원)</string>
+    <string name="piko_ai_filter_vault_monthly_estimate">한 달 예상(오늘 비용 × 30일): $%1$.2f (약 %2$,.0f원)</string>
+    <string name="piko_ai_filter_vault_failures">실패 %1$d건 (시간 초과 %2$d · HTTP 오류 %3$d · 기타 %4$d)</string>
+    <string name="piko_ai_filter_vault_latency">평균 판별 %1$d ms · 타임라인 대기 평균 %2$d ms</string>
+    <string name="piko_ai_filter_vault_last_error">마지막 오류: %s</string>
+    <string name="piko_ai_filter_vault_meta">%1$s · 확률 %2$.2f · 미디어 %3$d개 · %4$s</string>
+    <string name="piko_ai_filter_vault_quote">인용:</string>
+    <string name="piko_ai_filter_vault_retweeted_by">@%s 님이 재게시</string>
+
     <!-- Backup and Restore -->
     <string name="piko_title_backup">Backup and restore</string>
     <string name="piko_pref_import_settings">Import Piko settings</string>

@@ -408,6 +408,11 @@ public class SettingsStatus {
         externalDownloader = true;
     }
 
+    public static boolean aiTimelineFilter = false;
+    public static void aiTimelineFilter() {
+        aiTimelineFilter = true;
+    }
+
 
     public static boolean enableTimelineSection() {
         return ( hidePostMetrics || hideNavbarBadge || showSourceLabel || hideCommBadge || showSensitiveMedia || hideNudgeButton || disableAutoTimelineScroll || forceTranslate || hidePromoteButton || hideCommunityNote || hideLiveThreads || hideBanner || hideInlineBmk || showPollResultsEnabled || hideImmersivePlayer || enableVidAutoAdvance || enableForceHD);
