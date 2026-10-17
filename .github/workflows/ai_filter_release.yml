@@ -1,0 +1,83 @@
+name: AI filter release
+
+# Morphe Manager reads patches-bundle.json from the main branch of a GitHub source.
+# Code lives on this branch; main only receives the bundle metadata, so syncing with upstream never conflicts on it.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/ai-timeline-filter
+
+permissions:
+  contents: write
+  packages: read
+
+concurrency:
+  group: ai-filter-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache Gradle
+        uses: burrunan/gradle-cache-action@v3
+
+      - name: Build with Gradle
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew buildAndroid
+
+      - name: Create release
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          base_version=$(sed -n 's/^version = //p' gradle.properties)
+          version="${base_version}-ai.${GITHUB_RUN_NUMBER}"
+          bundle="patches-${version}.mpp"
+          cp "patches/build/libs/patches-${base_version}.mpp" "$bundle"
+
+          notes="AI 타임라인 필터 포함 빌드: $(git log -1 --format='%h %s')"
+          gh release create "v${version}" "$bundle" --target "$GITHUB_SHA" --title "v${version}" --notes "$notes"
+
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "download_url=https://github.com/${GITHUB_REPOSITORY}/releases/download/v${version}/${bundle}" >> "$GITHUB_OUTPUT"
+          echo "notes=${notes}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          path: main-branch
+
+      - name: Update patches-bundle.json on main
+        working-directory: main-branch
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+          DOWNLOAD_URL: ${{ steps.release.outputs.download_url }}
+          NOTES: ${{ steps.release.outputs.notes }}
+        run: |
+          jq -n \
+            --arg created_at "$(date -u +%Y-%m-%dT%H:%M:%S)" \
+            --arg description "$NOTES" \
+            --arg download_url "$DOWNLOAD_URL" \
+            --arg version "$VERSION" \
+            '{created_at: $created_at, description: $description, download_url: $download_url, version: $version}' \
+            > patches-bundle.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add patches-bundle.json
+          git commit -m "chore: 패치 번들 v${VERSION} 배포 [skip ci]"
+          git push origin main
