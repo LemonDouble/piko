@@ -120,7 +120,7 @@ public class Settings {
 
     public static final StringSetting AI_FILTER_API_KEY = new StringSetting("ai_filter_api_key", "");
     public static final StringSetting AI_FILTER_TIMEOUT_MILLIS = new StringSetting("ai_filter_timeout_millis", "3000");
-    public static final int AI_FILTER_RULE_SLOTS = 3;
+    public static final int AI_FILTER_RULE_SLOTS = 5;
 
     // AI filter settings below are stored per logged-in X account.
     public static BooleanSetting aiFilterEnabled(String accountId) {
