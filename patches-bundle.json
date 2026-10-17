@@ -1,6 +1,6 @@
 {
-  "created_at": "2026-10-17T07:35:11",
-  "description": "AI 타임라인 필터 포함 빌드: b021c42 feat(Twitter): AI 필터 슬롯을 5개로 늘림",
-  "download_url": "https://github.com/LemonDouble/piko/releases/download/v3.10.0-dev.14-ai.3/patches-3.10.0-dev.14-ai.3.mpp",
-  "version": "3.10.0-dev.14-ai.3"
+  "created_at": "2026-10-17T07:41:11",
+  "description": "AI 타임라인 필터 포함 빌드: 54b662f feat(Twitter): AI 필터 사용량 초기화 버튼 추가",
+  "download_url": "https://github.com/LemonDouble/piko/releases/download/v3.10.0-dev.14-ai.4/patches-3.10.0-dev.14-ai.4.mpp",
+  "version": "3.10.0-dev.14-ai.4"
 }
